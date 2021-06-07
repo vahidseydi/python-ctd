@@ -61,6 +61,10 @@ def _open_compressed(fname):
 
 def _read_file(fname):
     """Read file contents."""
+    if isinstance(fname, bytes):
+        text = fname.decode(encoding="utf-8", errors="replace")
+        return StringIO(text)
+        
     if not isinstance(fname, Path):
         fname = Path(fname).resolve()
 
