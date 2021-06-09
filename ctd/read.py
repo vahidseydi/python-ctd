@@ -19,7 +19,8 @@ import pandas as pd
 
 
 def _basename(fname):
-    """Return file name without path."""
+    """Return file name without path."""    
+
     if not isinstance(fname, Path):
         fname = Path(fname)
     path, name, ext = fname.parent, fname.stem, fname.suffix
@@ -215,7 +216,7 @@ def from_bl(fname):
     return df
 
 
-def from_btl(fname):
+def from_btl(fname, name=None):
     """
     DataFrame constructor to open Seabird CTD BTL-ASCII format.
 
@@ -263,8 +264,11 @@ def from_btl(fname):
 
     df["Statistic"] = df["Statistic"].str.replace(r"\(|\)", "")  # (avg) to avg
 
-    name = _basename(fname)[1]
-
+    if isinstance(fname,bytes):
+        name = _basename(name)[1]
+    else:
+        name = _basename(fname)[1]
+        
     dtypes = {
         "bpos": int,
         "pumps": bool,
@@ -302,7 +306,7 @@ def from_edf(fname):
     >>> ax = cast['temperature'].plot_cast()
 
     """
-    f = _read_file(fname)
+    f = _read_file(fname,name=None)
     header, names = [], []
     for k, line in enumerate(f.readlines()):
         line = line.strip()
@@ -352,7 +356,11 @@ def from_edf(fname):
 
     df.set_index("depth", drop=True, inplace=True)
     df.index.name = "Depth [m]"
-    name = _basename(fname)[1]
+
+    if isinstance(fname,bytes):
+        name = _basename(name)[1]
+    else:
+        name = _basename(fname)[1]
 
     metadata = {
         "lon": lon,
@@ -365,7 +373,7 @@ def from_edf(fname):
     return df
 
 
-def from_cnv(fname):
+def from_cnv(fname,name=None):
     """
     DataFrame constructor to open Seabird CTD CNV-ASCII format.
 
@@ -416,7 +424,10 @@ def from_cnv(fname):
             )
             df.index.name = prkey
 
-    name = _basename(fname)[1]
+    if isinstance(fname,bytes):
+        name = _basename(name)[1]
+    else:
+        name = _basename(fname)[1]
 
     dtypes = {"bpos": int, "pumps": bool, "flag": bool}
     for column in df.columns:
@@ -433,7 +444,7 @@ def from_cnv(fname):
     return df
 
 
-def from_fsi(fname, skiprows=9):
+def from_fsi(fname,skiprows=9):
     """
     DataFrame constructor to open Falmouth Scientific, Inc. (FSI) CTD
     ASCII format.
